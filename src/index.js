@@ -20,7 +20,7 @@ app.use(cors());
 createUserTable();
 
 // routes
-app.use("/api", userRoutes);
+app.use("/api/users", userRoutes);
 // error handling middleware
 app.use(errorHandling);
 // Testing postgres connection

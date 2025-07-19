@@ -1,13 +1,10 @@
-import experss from "express";
-import { getAllUsers, registerUser, updateUser,getUserById } from "../controllers/userController.js";
+import express from 'express';
+import { registerUser, loginUser } from '../controllers/userController.js';
 
-const router = experss.Router();
+const router = express.Router();
 
-// router.post("/login", );
-router.post("/register", registerUser)
-// router.post("/logout", logoutUser);
-router.post("/user/update", updateUser);
-router.get("/user", getAllUsers);
-router.get("/user/:id", getUserById);
+router.post('/register', registerUser);
+router.post('/login', loginUser);
+// router.post('/logout', logoutUser);
 
 export default router;
