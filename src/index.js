@@ -16,13 +16,14 @@ app.use(express.json());
 app.use(cors());
 
 // Crate table before starting table
-
 createUserTable();
 
 // routes
 app.use("/api/users", userRoutes);
+
 // error handling middleware
 app.use(errorHandling);
+
 // Testing postgres connection
 app.get("/", async(req, res)=>{
     const result = await pool.query("SELECT current_database()");
