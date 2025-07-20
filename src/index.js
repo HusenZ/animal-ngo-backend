@@ -5,6 +5,8 @@ import pool from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import errorHandling from "./middlewares/errorHandler.js";
 import { createUserTable } from "./data/createUserTable.js";
+import donationRoutes from "./routes/donationRoutes.js";
+import { createDonationRequestsTable } from "./data/createDonationReqTable.js"; // adjust path
 
 dotenv.config();
 
@@ -17,9 +19,11 @@ app.use(cors());
 
 // Crate table before starting table
 createUserTable();
+createDonationRequestsTable();
 
 // routes
 app.use("/api/users", userRoutes);
+app.use("/api/donations", donationRoutes);
 
 // error handling middleware
 app.use(errorHandling);
