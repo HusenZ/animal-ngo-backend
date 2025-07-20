@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { findUserByEmail, createUser } from '../models/userModel.js';
+import pool from "../config/db.js";
 
 const generateToken = (user) => {
   return jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET, {
@@ -70,5 +71,78 @@ export const logoutUser = async (req, res, next) => {
     res.status(200).json({ message: 'Logout successful. Please delete the token on the client.' });
   } catch (error) {
     next(error);
+  }
+};
+
+export const getUserById = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const result = await pool.query("SELECT id, name, email, role, phone_number, address, created_at FROM users WHERE id = $1", [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+export const updateUser = async (req, res, next) => {
+  const { id } = req.params;
+  const { name, email, phone_number, address, role } = req.body;
+
+  try {
+    const userCheck = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
+    if (userCheck.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const result = await pool.query(
+      `UPDATE users
+       SET name = COALESCE($1, name),
+           email = COALESCE($2, email),
+           phone_number = COALESCE($3, phone_number),
+           address = COALESCE($4, address),
+           role = COALESCE($5, role)
+       WHERE id = $6
+       RETURNING id, name, email, phone_number, address, role`,
+      [name, email, phone_number, address, role, id]
+    );
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: result.rows[0],
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+export const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+
+  try {
+    const result = await pool.query("DELETE FROM users WHERE id = $1 RETURNING *", [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "User deleted successfully", user: result.rows[0] });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+// ADMIN ROUTE countroller
+export const getAllUsers = async (req, res) => {
+  try {
+    const result = await pool.query("SELECT id, name, email, role, phone_number, address, created_at FROM users");
+    res.status(200).json({ users: result.rows });
+  } catch (error) {
+    res.status(500).json({ message: "Something went wrong", error: error.message });
   }
 };

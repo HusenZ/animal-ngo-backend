@@ -15,7 +15,6 @@ export const createUser = async (name, email, hashedPassword, role, phone_number
   return result.rows[0];
 };
 
-
 //------------------------------ SEPERATER --------------------
 const getAllUserService = async () => {
   const result = await pool.query('SELECT * FROM users');
