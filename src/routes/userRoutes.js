@@ -1,5 +1,5 @@
 import express from 'express';
-import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, deleteUser } from '../controllers/userController.js';
+import { registerUser, loginUser, logoutUser, getAllUsers, getUserById, updateUser, deleteUser, setUserLocation, getNearbyUsers} from '../controllers/userController.js';
 // import { protect } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -11,6 +11,9 @@ router.post('/logout', logoutUser);
 router.get("/:id", getUserById);
 
 router.put("/:id", updateUser);
+
+router.put('/location/:id', setUserLocation);
+router.get('/nearby', getNearbyUsers);
 
 //admin routes
 router.delete("/:id", deleteUser);

@@ -14,7 +14,29 @@ export const createUser = async (name, email, hashedPassword, role, phone_number
   );
   return result.rows[0];
 };
+export const getNearbyUsers = async (latitude, longitude, distance) => {
+  const query = `
+    SELECT id, name, email, phone_number, address,
+      ST_Distance(location, ST_MakePoint($1, $2)::geography) AS distance
+    FROM users
+    WHERE ST_DWithin(location, ST_MakePoint($1, $2)::geography, $3)
+    ORDER BY distance ASC;
+  `;
+  const values = [longitude, latitude, distance];
+  const { rows } = await pool.query(query, values);
+  return rows;
+};
 
+export const updateUserLocation = async (userId, latitude, longitude) => {
+  const query = `
+    UPDATE users
+    SET location = ST_SetSRID(ST_MakePoint($1, $2), 4326)::geography
+    WHERE id = $3 RETURNING *;
+  `;
+  const values = [longitude, latitude, userId];
+  const { rows } = await pool.query(query, values);
+  return rows[0];
+};
 //------------------------------ SEPERATER --------------------
 const getAllUserService = async () => {
   const result = await pool.query('SELECT * FROM users');
