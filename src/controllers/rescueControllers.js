@@ -3,13 +3,12 @@ import pool from '../config/db.js';
 // Create a new rescue case
 export const createRescueCase = async (req, res, next) => {
   try {
-    const { title, description, image_url, latitude, longitude } = req.body;
-    const reporter_user_id = req.user.id;
+    const { title, description, image_url, latitude, longitude, reporter_user_id } = req.body;
 
-    if (!title || !description || latitude == null || longitude == null) {
+    if (!title || !description || latitude == null || longitude == null || !reporter_user_id) {
       return res.status(400).json({
         success: false,
-        message: 'Title, description, latitude, and longitude are required'
+        message: 'Title, description, latitude, longitude, and reporter_user_id are required'
       });
     }
 
@@ -45,7 +44,7 @@ export const createRescueCase = async (req, res, next) => {
       message: 'Rescue case created successfully',
       data: {
         ...rows[0],
-        reporter: reporterResult.rows[0]
+        reporter: reporterResult.rows[0] || null
       }
     });
 
@@ -59,7 +58,11 @@ export const createRescueCase = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid user reference' });
     }
 
-    next(error);
+    return res.status(500).json({
+      success: false,
+      message: 'Something went wrong',
+      error: error.message
+    });
   }
 };
 
