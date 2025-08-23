@@ -15,7 +15,6 @@ export const createUserTable = async () => {
 )`;
   try {
     pool.query(queryText);
-    Digital;
     console.log('User table created if not exists');
   } catch (err) {
     console.log('Error creating users table: ', err);
