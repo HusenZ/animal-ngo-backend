@@ -14,7 +14,7 @@ export const createUserTable = async () => {
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )`;
   try {
-    pool.query(queryText);
+    await pool.query(queryText);
     console.log('User table created if not exists');
   } catch (err) {
     console.log('Error creating users table: ', err);
