@@ -1,19 +1,32 @@
-import jwt from 'jsonwebtoken';
+// middlewares/authMiddleware.js
+import jwt from "jsonwebtoken";
 
-export const protect = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
-  const token = authHeader.split(' ')[1];
-
+export const verifyToken = (req, res, next) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // id and role from token
-    next();
+    // Check if Authorization header exists
+    const authHeader = req.headers["authorization"];
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ message: "Unauthorized - no token provided" });
+    }
+
+    // Extract token
+    const token = authHeader.split(" ")[1];
+
+    // Verify token
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: "Unauthorized - invalid token" });
+      }
+
+      req.user = {
+        id: decoded.id,
+        email: decoded.email,
+        role: decoded.role || null,
+      };
+
+      next(); // Continue to the controller
+    });
   } catch (error) {
-    res.status(401).json({ message: 'Invalid or expired token' });
+    return res.status(500).json({ message: "Server error in auth middleware" });
   }
 };

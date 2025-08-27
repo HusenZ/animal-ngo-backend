@@ -17,7 +17,7 @@ export const createRescueTable = async () => {
 
     // 2. Create the table if not exists
     const createTableQuery = `
-      CREATE TABLE IF NOT EXISTS rescue_cases (
+      CREATE TABLE IF NOT EXISTS rescues (
         id SERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         description TEXT NOT NULL,

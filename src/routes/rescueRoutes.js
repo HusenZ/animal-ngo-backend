@@ -12,6 +12,7 @@ import {
   validateNearbyQuery, 
   validateStatusUpdate 
 } from '../middlewares/validation.js';
+import { verifyToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ const router = express.Router();
 router.post('/', validateRescueCase, createRescueCase);
 
 // GET /api/rescue/nearby → Rescue cases near you (volunteers)
-router.get('/nearby', validateNearbyQuery, getNearbyRescueCases);
+router.post('/nearby', verifyToken,  getNearbyRescueCases);
 
 // PUT /api/rescue/:id/assign → Assign volunteer
 router.put('/:id/assign', assignVolunteer);

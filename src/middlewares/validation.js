@@ -52,43 +52,67 @@ export const validateRescueCase = (req, res, next) => {
     const { latitude, longitude, radius, status, limit, offset } = req.query;
     const errors = [];
   
-    // Validate coordinates
-    if (!latitude) {
-      errors.push({ field: 'latitude', message: 'Latitude is required' });
-    } else if (isNaN(latitude) || parseFloat(latitude) < -90 || parseFloat(latitude) > 90) {
-      errors.push({ field: 'latitude', message: 'Latitude must be between -90 and 90' });
+    // ✅ Latitude validation
+    if (!latitude || isNaN(latitude)) {
+      errors.push({ field: "latitude", message: "Latitude is required and must be a number" });
+    } else {
+      const lat = parseFloat(latitude);
+      if (lat < -90 || lat > 90) {
+        errors.push({ field: "latitude", message: "Latitude must be between -90 and 90" });
+      }
     }
   
-    if (!longitude) {
-      errors.push({ field: 'longitude', message: 'Longitude is required' });
-    } else if (isNaN(longitude) || parseFloat(longitude) < -180 || parseFloat(longitude) > 180) {
-      errors.push({ field: 'longitude', message: 'Longitude must be between -180 and 180' });
+    // ✅ Longitude validation
+    if (!longitude || isNaN(longitude)) {
+      errors.push({ field: "longitude", message: "Longitude is required and must be a number" });
+    } else {
+      const lon = parseFloat(longitude);
+      if (lon < -180 || lon > 180) {
+        errors.push({ field: "longitude", message: "Longitude must be between -180 and 180" });
+      }
     }
   
-    // Validate optional parameters
-    if (radius && (isNaN(radius) || parseInt(radius) < 100 || parseInt(radius) > 100000)) {
-      errors.push({ field: 'radius', message: 'Radius must be between 100 and 100000 meters' });
+    // ✅ Optional fields
+    if (radius) {
+      const r = parseInt(radius);
+      if (isNaN(r) || r < 100 || r > 100000) {
+        errors.push({ field: "radius", message: "Radius must be a number between 100 and 100000 meters" });
+      }
     }
   
-    if (status && !['pending', 'assigned', 'resolved', 'all'].includes(status)) {
-      errors.push({ field: 'status', message: 'Status must be pending, assigned, resolved, or all' });
+    if (status && !["pending", "assigned", "resolved", "all"].includes(status)) {
+      errors.push({ field: "status", message: "Status must be one of: pending, assigned, resolved, all" });
     }
   
-    if (limit && (isNaN(limit) || parseInt(limit) < 1 || parseInt(limit) > 100)) {
-      errors.push({ field: 'limit', message: 'Limit must be between 1 and 100' });
+    if (limit) {
+      const l = parseInt(limit);
+      if (isNaN(l) || l < 1 || l > 100) {
+        errors.push({ field: "limit", message: "Limit must be a number between 1 and 100" });
+      }
     }
   
-    if (offset && (isNaN(offset) || parseInt(offset) < 0)) {
-      errors.push({ field: 'offset', message: 'Offset must be 0 or greater' });
+    if (offset) {
+      const o = parseInt(offset);
+      if (isNaN(o) || o < 0) {
+        errors.push({ field: "offset", message: "Offset must be a number greater than or equal to 0" });
+      }
     }
   
+    // ✅ If validation fails
     if (errors.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'Validation failed',
-        errors
+        message: "Validation failed",
+        errors,
       });
     }
+  
+    // ✅ Convert values for use in controller
+    req.query.latitude = parseFloat(latitude);
+    req.query.longitude = parseFloat(longitude);
+    if (radius) req.query.radius = parseInt(radius);
+    if (limit) req.query.limit = parseInt(limit);
+    if (offset) req.query.offset = parseInt(offset);
   
     next();
   };

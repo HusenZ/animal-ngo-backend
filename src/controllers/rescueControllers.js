@@ -17,7 +17,7 @@ export const createRescueCase = async (req, res, next) => {
     }
 
     const insertQuery = `
-      INSERT INTO rescue_cases (title, description, image_url, location, reporter_user_id)
+      INSERT INTO rescues (title, description, image_url, location, reporter_user_id)
       VALUES ($1, $2, $3, ST_SetSRID(ST_MakePoint($4, $5), 4326), $6)
       RETURNING 
         id, title, description, image_url, reporter_user_id,
@@ -67,53 +67,47 @@ export const createRescueCase = async (req, res, next) => {
 };
 
 // Get nearby rescue cases (for volunteers)
-export const getNearbyRescueCases = async (req, res, next) => {
+export const getNearbyRescueCases = async (req, res) => {
   try {
-    const { lat, lng, radius = 5, limit = 20, offset = 0 } = req.query;
-    const user_id = req.user.id;
+    const { latitude, longitude, radius } = req.body;
 
-    if (!lat || !lng) {
-      return res.status(400).json({ success: false, message: 'Latitude and longitude are required' });
+    console.log("REQ BODY:", req.body);
+
+
+    if (!latitude || !longitude) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude and longitude are required",
+      });
     }
 
-    const values = [
-      parseFloat(lng),
-      parseFloat(lat),
-      parseInt(radius),
-      user_id,
-      parseInt(limit),
-      parseInt(offset)
-    ];
+    const searchRadius = radius || 5000; // default 5km
 
-    const nearbyQuery = `
-      SELECT 
-        rc.id, rc.title, rc.description, rc.image_url,
-        rc.status, rc.created_at,
-        ST_X(rc.location) as longitude, ST_Y(rc.location) as latitude,
-        u.id as reporter_id, u.name as reporter_name
-      FROM rescue_cases rc
-      JOIN users u ON rc.reporter_user_id = u.id
-      WHERE 
-        ST_DWithin(rc.location, ST_SetSRID(ST_MakePoint($1, $2), 4326), $3 * 1000)
-        AND rc.status = 'pending'
-        AND rc.reporter_user_id != $4
-      ORDER BY rc.created_at DESC
-      LIMIT $5 OFFSET $6
+    // Example PostGIS query (if using PostgreSQL + PostGIS)
+    const query = `
+      SELECT *, ST_Distance(location, ST_SetSRID(ST_MakePoint($1, $2), 4326)) as distance
+      FROM rescues
+      WHERE ST_DWithin(location, ST_SetSRID(ST_MakePoint($1, $2), 4326), $3)
+      ORDER BY distance ASC;
     `;
 
-    const { rows } = await pool.query(nearbyQuery, values);
+    const result = await pool.query(query, [longitude, latitude, searchRadius]);
 
-    return res.status(200).json({
+    res.json({
       success: true,
-      results: rows.length,
-      data: rows
+      count: result.rows.length,
+      rescues: result.rows,
     });
-
   } catch (error) {
-    console.error('Get nearby rescue cases error:', error);
-    next(error);
+    console.error("Error fetching nearby rescues:", error);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+      error: error.message,
+    });
   }
 };
+
 
 // Assign a volunteer to a case
 export const assignVolunteer = async (req, res, next) => {
