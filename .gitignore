@@ -35,6 +35,24 @@ pids/
 docker-compose.override.yml
 *.local.yml
 *.env.docker
+Dockerfile.local
+.dockerignore.local
+docker-compose.local.yml
+docker-compose.dev.yml
+docker-compose.prod.yml
+.docker/
+docker/volumes/
+docker/data/
+
+# Docker container data
+postgres-data/
+mysql-data/
+mongo-data/
+redis-data/
+
+# Docker logs
+docker-compose.logs
+*.docker.log
 
 # Misc
 .cache/
